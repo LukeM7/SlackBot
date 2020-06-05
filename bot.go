@@ -61,7 +61,7 @@ func response(rtm *slack.RTM, message *slack.MessageEvent) {
 		rtm.SendMessage(rtm.NewOutgoingMessage(rockPaperScissors(messageText), message.Channel))
 	} else if help[messageText] {
 		rtm.SendMessage(rtm.NewOutgoingMessage(
-			"Commands: \n\tTo play a game: @Gobot rock paper scissors *choice*\n\tTo say hi: @Gobot hello/what's up", message.Channel))
+			"Commands: \n\tTo play a game: @Gobot rock paper scissors *choice*\n\tTo say hi: @Gobot hi/hello/what's up", message.Channel))
 	} else if textResponses[messageText] {
 		rtm.SendMessage(rtm.NewOutgoingMessage("Hey how are you doing?", message.Channel))
 	}
