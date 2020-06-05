@@ -3,50 +3,23 @@ package main
 
 import (
 	"fmt"
-	"regexp"
-	"strings"
 
 	"github.com/slack-go/slack"
 )
 
 func main() {
-
-	api := slack.New("xoxp-1117499265159-1125508635446-1190043385088-54427fa1679c89e8725d604838afc783")
+	api := slack.New("xoxb-1117499265159-1151646799927-KJXqU3blMJaRjeIlgYWEPe7S")
 	rtm := api.NewRTM()
 	go rtm.ManageConnection()
-	for {
-		select {
-		case msg := <-rtm.IncomingEvents:
-			fmt.Print("Event Received: ")
-			switch ev := msg.Data.(type) {
 
-			case *slack.MessageEvent:
-				info := rtm.GetInfo()
-
-				text := ev.Text
-				text = strings.TrimSpace(text)
-				text = strings.ToLower(text)
-
-				matched, _ := regexp.MatchString("dark souls", text)
-
-				if ev.User != info.User.ID && matched {
-					rtm.SendMessage(rtm.NewOutgoingMessage("\\[T]/ Praise the Sun \\[T]/", ev.Channel))
-				}
-
-			case *slack.RTMError:
-				fmt.Printf("Error: %s\n", ev.Error())
-
-			case *slack.InvalidAuthEvent:
-				fmt.Printf("Invalid credentials")
-				return
-
-			default:
-				// Take no action
-			}
+	for message := range rtm.IncomingEvents {
+		switch event := message.Data.(type) {
+		case *slack.MessageEvent:
+			go handleMessage(event)
 		}
 	}
-}
 
+}
 func handleMessage(event *slack.MessageEvent) {
 	fmt.Printf("%v\n", event)
 }
@@ -98,4 +71,3 @@ func rockPaperScissors() string {
 	return gameResponse[randomIndex]
 }
 */
-
