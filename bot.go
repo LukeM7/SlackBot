@@ -1,4 +1,11 @@
 // Luke Manzitto
+/*
+* Sources used to Learn:
+* https://rsmitty.github.io/Slack-Bot/
+* https://x-team.com/blog/writing-slackbots-with-goroutines/
+* https://www.youtube.com/watch?v=zkB_c3cgtd0
+*
+ */
 package main
 
 import (
@@ -9,19 +16,21 @@ import (
 	"github.com/slack-go/slack"
 )
 
+// Global game check var
 var gameCheck bool = false
 
 func main() {
 	// Should use environment variable for good practice
 	api := slack.New("xoxb-1117499265159-1151646799927-KJXqU3blMJaRjeIlgYWEPe7S")
-
 	rtm := api.NewRTM()
 	go rtm.ManageConnection()
 	for message := range rtm.IncomingEvents {
 		switch event := message.Data.(type) {
 		// If a message is recieved
 		case *slack.MessageEvent:
-			go response(rtm, event)
+			info := rtm.GetInfo()
+			prefix := fmt.Sprintf("<@%s>", info.User.ID)
+			response(rtm, event, prefix)
 		// If the RTM gets an error
 		case *slack.RTMError:
 			fmt.Println(event.Error())
@@ -33,10 +42,11 @@ func main() {
 	}
 }
 
-func response(rtm *slack.RTM, message *slack.MessageEvent) {
+func response(rtm *slack.RTM, message *slack.MessageEvent, prefix string) {
 
 	// puts user message in all lowercase so we don't have to account for variations in upper/lowercase
 	messageText := message.Text
+	messageText = strings.TrimPrefix(messageText, prefix)
 	messageText = strings.TrimSpace(messageText)
 	messageText = strings.ToLower(messageText)
 
