@@ -4,7 +4,6 @@
 * https://rsmitty.github.io/Slack-Bot/
 * https://x-team.com/blog/writing-slackbots-with-goroutines/
 * https://www.youtube.com/watch?v=zkB_c3cgtd0
-*
  */
 package main
 
@@ -23,7 +22,7 @@ func main() {
 	// Should use environment variable for good practice
 	api := slack.New("xoxb-1117499265159-1151646799927-KJXqU3blMJaRjeIlgYWEPe7S")
 	rtm := api.NewRTM()
-	go rtm.ManageConnection()
+	go rtm.ManageConnection() // Goroutine manages websocket connections
 	for message := range rtm.IncomingEvents {
 		switch event := message.Data.(type) {
 		// If a message is recieved
@@ -42,6 +41,7 @@ func main() {
 	}
 }
 
+// Bot responses to user input
 func response(rtm *slack.RTM, message *slack.MessageEvent, prefix string) {
 
 	// puts user message in all lowercase so we don't have to account for variations in upper/lowercase
@@ -87,6 +87,7 @@ func response(rtm *slack.RTM, message *slack.MessageEvent, prefix string) {
 	}
 }
 
+// Rock, paper, scissors logic
 func rockPaperScissors(userResponse string, rtm *slack.RTM, message *slack.MessageEvent) string {
 	gameResponse := map[int]string{
 		0: "rock",
@@ -98,9 +99,9 @@ func rockPaperScissors(userResponse string, rtm *slack.RTM, message *slack.Messa
 	fmt.Println("I chose " + gameResponse[randomIndex])
 	rtm.SendMessage(rtm.NewOutgoingMessage("I chose "+gameResponse[randomIndex], message.Channel))
 	if gameResponse[randomIndex] == userResponse {
-		return "Draw"
+		return "DRAW"
 	} else if (userResponse == "scissors" && gameResponse[randomIndex] == "paper") || (userResponse == "paper" && gameResponse[randomIndex] == "rock") || (userResponse == "rock" && gameResponse[randomIndex] == "scissors") {
-		return "You Win!"
+		return "YOU WIN!"
 	} else {
 		return "I WIN!"
 	}
