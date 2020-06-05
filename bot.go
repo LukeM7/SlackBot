@@ -15,21 +15,25 @@ func main() {
 	go rtm.ManageConnection()
 	for message := range rtm.IncomingEvents {
 		switch event := message.Data.(type) {
+		// If a message is recieved
 		case *slack.MessageEvent:
 			go response(rtm, event)
+		// If the RTM gets an error
 		case *slack.RTMError:
 			fmt.Println(event.Error())
+		// If the authentaction token doesn't work
 		case *slack.InvalidAuthEvent:
 			fmt.Println("Bad authentication token")
 			return
 
 		}
 	}
-
 }
 
+//
 func response(rtm *slack.RTM, message *slack.MessageEvent) {
 
+	// puts user message in all lowercase so we don't have to account for variations in upper/lowercase
 	messageText := message.Text
 	messageText = strings.TrimSpace(messageText)
 	messageText = strings.ToLower(messageText)
@@ -57,7 +61,7 @@ func response(rtm *slack.RTM, message *slack.MessageEvent) {
 	if gameStarts[messageText] {
 		rtm.SendMessage(rtm.NewOutgoingMessage("Choose rock, paper, or scissors", message.Channel))
 	} else if playGame[messageText] {
-		rtm.SendMessage(rtm.NewOutgoingMessage(rockPaperScissors(messageText), message.Channel))
+		rtm.SendMessage(rtm.NewOutgoingMessage(rockPaperScissors(messageText, rtm, message), message.Channel))
 	} else if help[messageText] {
 		rtm.SendMessage(rtm.NewOutgoingMessage(
 			"Commands: \n\tTo play a game: @Gobot rock paper scissors *choice*\n\tTo say hi: @Gobot hi/hello/what's up", message.Channel))
@@ -66,7 +70,7 @@ func response(rtm *slack.RTM, message *slack.MessageEvent) {
 	}
 }
 
-func rockPaperScissors(userResponse string) string {
+func rockPaperScissors(userResponse string, rtm *slack.RTM, message *slack.MessageEvent) string {
 	gameResponse := map[int]string{
 		0: "rock",
 		1: "paper",
@@ -75,7 +79,7 @@ func rockPaperScissors(userResponse string) string {
 	randomIndex := rand.Intn(3)
 	fmt.Println(randomIndex)
 	fmt.Println("I chose " + gameResponse[randomIndex])
-
+	rtm.SendMessage(rtm.NewOutgoingMessage("I chose "+gameResponse[randomIndex], message.Channel))
 	if gameResponse[randomIndex] == userResponse {
 		return "Draw"
 	} else if (userResponse == "scissors" && gameResponse[randomIndex] == "paper") || (userResponse == "paper" && gameResponse[randomIndex] == "rock") || (userResponse == "rock" && gameResponse[randomIndex] == "scissors") {
