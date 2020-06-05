@@ -9,7 +9,10 @@ import (
 	"github.com/slack-go/slack"
 )
 
+var gameCheck bool = false
+
 func main() {
+	// Should use environment variable for good practice
 	api := slack.New("xoxb-1117499265159-1151646799927-KJXqU3blMJaRjeIlgYWEPe7S")
 	rtm := api.NewRTM()
 	go rtm.ManageConnection()
@@ -25,12 +28,10 @@ func main() {
 		case *slack.InvalidAuthEvent:
 			fmt.Println("Bad authentication token")
 			return
-
 		}
 	}
 }
 
-//
 func response(rtm *slack.RTM, message *slack.MessageEvent) {
 
 	// puts user message in all lowercase so we don't have to account for variations in upper/lowercase
@@ -59,12 +60,16 @@ func response(rtm *slack.RTM, message *slack.MessageEvent) {
 	help := map[string]bool{"help": true}
 
 	if gameStarts[messageText] {
+		gameCheck = true
 		rtm.SendMessage(rtm.NewOutgoingMessage("Choose rock, paper, or scissors", message.Channel))
-	} else if playGame[messageText] {
+	} else if playGame[messageText] && gameCheck {
+		gameCheck = false
 		rtm.SendMessage(rtm.NewOutgoingMessage(rockPaperScissors(messageText, rtm, message), message.Channel))
+	} else if playGame[messageText] && !gameCheck {
+		rtm.SendMessage(rtm.NewOutgoingMessage("Please initiate game", message.Channel))
 	} else if help[messageText] {
 		rtm.SendMessage(rtm.NewOutgoingMessage(
-			"Commands: \n\tTo play a game: @Gobot rock paper scissors *choice*\n\tTo say hi: @Gobot hi/hello/what's up", message.Channel))
+			"Commands: \n\tTo play a game: @Gobot rock paper scissors\n\tTo say hi: @Gobot hi/hello/what's up", message.Channel))
 	} else if textResponses[messageText] {
 		rtm.SendMessage(rtm.NewOutgoingMessage("Hello there", message.Channel))
 	}
