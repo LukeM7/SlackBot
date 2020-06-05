@@ -3,6 +3,8 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
+	"strings"
 
 	"github.com/slack-go/slack"
 )
@@ -15,16 +17,14 @@ func main() {
 	for message := range rtm.IncomingEvents {
 		switch event := message.Data.(type) {
 		case *slack.MessageEvent:
-			go handleMessage(event)
+			info := rtm.GetInfo()
+			prefix := fmt.Sprintf("<@%s>", info.User.ID)
+			go response(rtm, event, prefix)
 		}
 	}
 
 }
-func handleMessage(event *slack.MessageEvent) {
-	fmt.Printf("%v\n", event)
-}
 
-/*
 func response(rtm *slack.RTM, message *slack.MessageEvent, prefix string) {
 
 	messageText := message.Text
@@ -52,7 +52,7 @@ func response(rtm *slack.RTM, message *slack.MessageEvent, prefix string) {
 	if gameStarts[messageText] {
 		rtm.SendMessage(rtm.NewOutgoingMessage("Choose rock, paper, or scissors", message.Channel))
 	} else if playGame[messageText] {
-		rtm.SendMessage(rtm.NewOutgoingMessage(rockPaperScissors(), message.Channel))
+		rtm.SendMessage(rtm.NewOutgoingMessage(rockPaperScissors(messageText), message.Channel))
 	} else if help[messageText] {
 		rtm.SendMessage(rtm.NewOutgoingMessage(
 			"Commands: \n\t@Gobot rock paper scissors *choice*\n\t @Gobot hello/what's up", message.Channel))
@@ -61,13 +61,21 @@ func response(rtm *slack.RTM, message *slack.MessageEvent, prefix string) {
 	}
 }
 
-func rockPaperScissors() string {
+func rockPaperScissors(userResponse string) string {
 	gameResponse := map[int]string{
 		0: "rock",
 		1: "paper",
 		2: "scissors",
 	}
-	randomIndex := rand.Int() % 3
-	return gameResponse[randomIndex]
+	randomIndex := rand.Intn(3)
+	fmt.Println(randomIndex)
+	fmt.Println("I chose " + gameResponse[randomIndex])
+
+	if gameResponse[randomIndex] == userResponse {
+		return "Draw"
+	} else if (userResponse == "scissors" && gameResponse[randomIndex] == "paper") || (userResponse == "paper" && gameResponse[randomIndex] == "rock") || (userResponse == "rock" && gameResponse[randomIndex] == "scissors") {
+		return "You Win!"
+	} else {
+		return "I WIN!"
+	}
 }
-*/
