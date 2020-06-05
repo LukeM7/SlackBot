@@ -14,6 +14,7 @@ var gameCheck bool = false
 func main() {
 	// Should use environment variable for good practice
 	api := slack.New("xoxb-1117499265159-1151646799927-KJXqU3blMJaRjeIlgYWEPe7S")
+
 	rtm := api.NewRTM()
 	go rtm.ManageConnection()
 	for message := range rtm.IncomingEvents {
@@ -50,6 +51,7 @@ func response(rtm *slack.RTM, message *slack.MessageEvent) {
 		"paper":    true,
 		"scissors": true,
 	}
+
 	// Responses to common greetings
 	textResponses := map[string]bool{
 		"hi":         true,
