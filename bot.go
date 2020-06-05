@@ -13,7 +13,6 @@ func main() {
 	api := slack.New("xoxb-1117499265159-1151646799927-KJXqU3blMJaRjeIlgYWEPe7S")
 	rtm := api.NewRTM()
 	go rtm.ManageConnection()
-
 	for message := range rtm.IncomingEvents {
 		switch event := message.Data.(type) {
 		case *slack.MessageEvent:
@@ -63,7 +62,7 @@ func response(rtm *slack.RTM, message *slack.MessageEvent) {
 		rtm.SendMessage(rtm.NewOutgoingMessage(
 			"Commands: \n\tTo play a game: @Gobot rock paper scissors *choice*\n\tTo say hi: @Gobot hi/hello/what's up", message.Channel))
 	} else if textResponses[messageText] {
-		rtm.SendMessage(rtm.NewOutgoingMessage("Hey how are you doing?", message.Channel))
+		rtm.SendMessage(rtm.NewOutgoingMessage("Hello there", message.Channel))
 	}
 }
 
