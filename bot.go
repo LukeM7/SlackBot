@@ -27,6 +27,7 @@ func main() {
 		switch event := message.Data.(type) {
 		// If a message is recieved
 		case *slack.MessageEvent:
+			// Used https://rsmitty.github.io/Slack-Bot/ 's method to find prefix
 			info := rtm.GetInfo()
 			prefix := fmt.Sprintf("<@%s>", info.User.ID)
 			response(rtm, event, prefix)
